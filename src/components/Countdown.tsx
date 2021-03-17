@@ -1,49 +1,29 @@
 import { useContext, useEffect, useState } from 'react';
 import { ChallengesContext } from '../contexts/ChallengesContext';
+import { CountdownContext } from '../contexts/CountdownContext';
 import styles from '../styles/components/Countdown.module.css';
 
-// tipagem global => declara pra saber o tipo
-let countdownTimeout: NodeJS.Timeout;
+
 
 export function Countdown() {
-  const { startNewChallenge } = useContext(ChallengesContext);
+  const { 
+    minutes, 
+    seconds, 
+    hasFinished, 
+    isActive,
+    startCountdown, 
+    resetCountdown 
+  } = useContext(CountdownContext);
 
-  const [time, setTime] = useState(0.1 * 60);
-  const [isActive, setIsActive] = useState(false);
-  const [hasFinished, setHasFinished] = useState(false);
-
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
+  // Por que não colocou isso dentro do contexto?
+  // Formatando um dado para a View poder acessá-la
+  // Ou seja, o que ta exigindo isso é o Layout e não a regra de negócio
 
   const [minuteLeft, minuteRight] = String(minutes).padStart(2, '0').split('');
   // se tiver '5', torna '05' => no split: '0' '5'
   const [secondLeft, secondRight] = String(seconds).padStart(2, '0').split('');
 
-  function startCountdown() {
-    setIsActive(true);
-  }
-
-  function resetCountdown() {
-    // pra evitar um delay de 1seg
-    clearTimeout(countdownTimeout);
-    setIsActive(false);
-    setTime(25 * 60);
-  }
-
-  useEffect(() => {
-    if(isActive && time > 0) {
-      countdownTimeout = setTimeout(() => {
-        setTime(time - 1);
-      }, 1000);
-    } else if(isActive && time === 0) {
-      setHasFinished(true);
-      setIsActive(false);
-      startNewChallenge();
-    }
-  }, [isActive, time])
-  // ao colocar o time no array de dependencias, 
-  // toda vez que o time mudar, useEffect entra em ação
-
+  
   return (
     <div>
       <div className={styles.countdownContainer}>
